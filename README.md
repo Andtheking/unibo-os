@@ -2,8 +2,8 @@
 
 ## Comandi
 
-| Comando   | Spiegazione    |
-| ---       | ---       | 
+|  Comando  | Spiegazione |
+| --------- | ----------- | 
 | `[[ condizioni ]]` | [Conditional Expressions](#conditional-expressions) | 
 | `read A B ...` | Legge una riga dallo **stdin**. [Altro](#read) | 
 | `while read A B ...` | Per leggere da file in modo comodo. [Esempio](#while-read) |
@@ -13,8 +13,16 @@
 | `head` | Scrive le prime 10 (di default) righe dallo STDIN. [Altro](#head) |
 | `tail` | Scrive le ultime 10 (di default) righe dallo STDIN. [Altro](#tail) | 
 | `sort` | Sorta le righe dell'STDIN in ordine crescente alfabeticamente. [Altro](#sort) |
+| `find` | Cerca qualcosa in tutta la gerarchia della cartella in cui è eseguito. [Altro](#find) | 
 
-## Variabili speciali
+## Variabili
+
+| Comando | Spiegazione |
+| ------- | ----------- |
+| `variabile=valore` | Dichiara una variabile locale di nome `variabile` e con valore `valore` **Attenzione, niente spazi!**, se vuoi che il valore abbia degli spazi, allora devi farei così `variabile=" valore con spazi "`. | 
+| `export variabile=valore` | Dichiara una variabile d'ambiente (quindi ereditata dai contesti figli). |
+
+### Variabili speciali già dichiarate
 
 | Variabile | Spiegazione |
 | --------- | ----------- |
@@ -22,6 +30,13 @@
 | `$#` | Ottieni il numero di argomenti passati allo script |
 | `$?` | Ottieni il codice di errore dell'ultima operazione eseguita |
 | `$$` | Ottieni il PID del processo che sta eseguendo lo script corrente |   
+| `$!` | Ottieni il PID dell'ultimo processo avviato in background dal processo corrente |   
+
+Per vederle tutte: 
+
+```bash
+MANWIDTH=150 man bash | grep -A 28 -E "^\s*Special Parameters"
+```
 
 ## Scripting
 
@@ -37,7 +52,7 @@ Sono quelle che usi in una `[[ condizione ]]`
 Vedi la lista completa nel manuale 
 
 ```bash
-man bash | grep -B 94 -- -eq 
+MANWIDTH=150 man bash | grep "CONDITIONAL EXPRESSIONS$" -A 97
 ``` 
 
 ## Parameter Expansions
@@ -80,7 +95,6 @@ Per avere la lunghezza della stringa contenuta in una variabile: `${#variabile}`
 | Sintassi | Cosa fa |
 | -------- | ------- |
 | `${variabile#qualcosa}` | Cerca l'occorrenza più corta di `qualcosa` nel valore di `variabile` partendo dall'inizio e lo toglie. Se gli hashtag sono due (`##`) cerca l'occorrenza più lunga. |  
-
 
 
 ## Ulteriori spiegazioni
@@ -148,12 +162,19 @@ Stampa le **ultime** 10 righe (le prime 10 dal basso)
 
 ### `grep`
 
-WIP
+| Flag utili | Cosa fa | 
+| ---------- | ------- |
+|  `-v`   | Stampa tutto TRANNE le righe che hanno le occorrenze |
 
-### Occorrenze
+### `find`
 
-#### Esempio
+Il comportamento del comando usato così senza parametri è quello di stampare il nome di ogni cosa che trova. Il comportamento però varia in base alle flag usate
 
-```bash
-
-```
+| Flag utili | Cosa fa |
+| ---------- | ------- |
+| `-name <regex>` | Cerca tutti i file/directory con un determinato nome | 
+| `-type <tipo>` | Se `tipo` è `f` allora cerca solo file, se `tipo` è `d` cerca solo directory. |
+| `-exec <comando>\;` | Esegue il `comando` per ogni occorrenza che trova nella gerarchia della cartella. Se si vuole usare ogni file trovato come parametro di un comando, ci si riferisce ad esso con `'{}'`. |
+| `-print` | Stampa il percorso relativo al file, utile se usato con `-exec` per capire su quale file il `comando` viene eseguito | 
+| `-mindepth <numero>` | La profondità minima, ovvero da quante cartelle in giù deve partire a cercare (1 considera dalla cartella corrente in giù, 2 considera solo il contenuto delle directory della cartella corrente e così via) |
+| `-maxdepth <numero>` | La profondità massima, ovvero quanto deve scendere al massimo di cartella in cartella. (1 si ferma alla cartella corrente, 2 si ferma alle cartelle della cartella corrente e via così) | 
